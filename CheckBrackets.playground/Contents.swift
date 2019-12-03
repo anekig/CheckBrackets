@@ -1,24 +1,23 @@
 import UIKit
 
 func checkBrackets(string: String) -> Int {
-    var stack: [(bracket: Character, index: String.Index?)] = []
-    var index: String.Index?
+    var stack: [(bracket: Character, index: Int?)] = []
+    var unbalancedClosedBracketIndex: Int?
     
-    for char in string {
+    for (i, char) in string.enumerated() {
         if isOpenBracket(char) {
-            let index = string.firstIndex(of: char)
-            stack.append((char, index))
+            stack.append((char, i))
         } else if isBracket(char)
             && (stack.isEmpty || !isBalancedBrackets(open: stack.removeLast().bracket, close: char))
         {
-            index = string.firstIndex(of: char)
+            unbalancedClosedBracketIndex = i
             break
         }
     }
     
-    if let index = index?.utf16Offset(in: string) {
+    if let index = unbalancedClosedBracketIndex {
         return index + 1
-    } else if let index = stack.last?.index?.utf16Offset(in: string) {
+    } else if let index = stack.last?.index {
         return index + 1
     } else {
         return -1
@@ -42,11 +41,13 @@ private func isBalancedBrackets(open: Character, close: Character) -> Bool {
 
 // TESTING
 let expressions = [
-    "1asddf5[))",
+    "[1(a{a{",
+    "[1[a[a",
     "gf(ddd[gh{ fd }fdf]",
     "{([]({}))[]}",
     "{1f[fl()gg;]!(F,).}",
     "34g]g(5t)",
+    "34g]g(5t)]",
     "[]",
     "{}[]",
     "{[]}()",
